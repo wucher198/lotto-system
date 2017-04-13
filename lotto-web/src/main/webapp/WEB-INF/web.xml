@@ -9,4 +9,7 @@
         <servlet-name>javax.ws.rs.core.Application</servlet-name>
         <url-pattern>/lotto/*</url-pattern>
     </servlet-mapping>
+    <!--<listener>
+	    <listener-class>org.h2.server.web.DbStarter</listener-class>
+	</listener>-->
 </web-app>
