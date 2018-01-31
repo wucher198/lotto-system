@@ -22,10 +22,6 @@
 			<artifactId>lotto-core</artifactId>
 			<type>ejb</type>
 		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-		</dependency>
 	</dependencies>
 	<build>
 		<finalName>${project.parent.artifactId}</finalName>
