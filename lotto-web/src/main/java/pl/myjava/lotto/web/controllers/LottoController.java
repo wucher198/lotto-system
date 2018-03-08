@@ -6,7 +6,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
-import pl.myjava.lotto.core.LottoService;
+import pl.myjava.lotto.api.LottoService;
 
 @Path("/")
 public class LottoController {
@@ -18,7 +18,7 @@ public class LottoController {
 	@Produces("application/json")
 	public String getHelloWorldJSON(@PathParam("name") String name) {
 		System.out.print(name);
-		return "{\"result\":\"" + lottoService.createHelloMessage(name) + "\"}";
+		return "{\"result\":\"" + lottoService.test(name) + "\"}";
 	}
 	
 	@POST
@@ -26,6 +26,6 @@ public class LottoController {
 	@Produces("application/xml")
 	public String getHelloWorldXML(@PathParam("name") String name) {
 		System.out.print(name);
-		return "<xml><result>" + lottoService.createHelloMessage(name) + "</result></xml>";
+		return "<xml><result>" + lottoService.test(name) + "</result></xml>";
 	}
 }

@@ -102,5 +102,6 @@
 		<module>lotto-core</module>
 		<module>lotto-web</module>
 		<module>lotto-ear</module>
+		<module>read-page</module>
 	</modules>
 </project>
