@@ -8,14 +8,16 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class ReadHTMLLottoPage {
 	private static final String TAG_THAT_WE_SEEK = "div";
 	private static final String PAGE_URL = "http://www.lotto.pl/lotto/wyniki-i-wygrane";
 	private static final String USER_AGENT = "Mozilla/5.0";
 	
-	private static final String[] searchString = {"lotto", "lottoPlus", "lottoSzansa"};
+	private static final String[] searchString = {"resultsItem lotto"};//, "lotto", "lottoPlus", "lottoSzansa"};
 	
 	public static void main(String[] args) throws Exception {
 		URL url = new URL(PAGE_URL);
@@ -41,6 +43,15 @@ public class ReadHTMLLottoPage {
 		BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 //		BufferedReader in = new BufferedReader(new StringReader(testString));
 		int input = 0;
+		List<String> result = searchForTags(in, TAG_THAT_WE_SEEK, "class", Arrays.asList(searchString));
+		result.forEach(System.out::println);
+		
+		in.close();
+	}
+
+	private static ArrayList<String> searchForTags(BufferedReader in, String tagWhatWeSeek, String attribute, List<String> searchStrings) throws IOException {
+		ArrayList<String> result = new ArrayList<>();
+		int input;
 		StringBuilder tagName = new StringBuilder();
 		StringBuilder wholeTag = new StringBuilder();
 		boolean searchForClosing = false;
@@ -57,13 +68,13 @@ public class ReadHTMLLottoPage {
 				tagName.append((char) input); // <div class="gvhjvh jkjhgkj ljkhkj">
 			}
 			
-			if (((char) input) == '>') {
+			if (ifInputEquals(input, '>')) {
 				if (searchForClosing) {
 					if (closingTag) {
-						if (checkIfEndContains(tagName.toString(), TAG_THAT_WE_SEEK)) {
+						if (checkIfEndContains(tagName.toString(), tagWhatWeSeek)) {
 						// sprawdzamy czy nie ma jakichkolwiek wewnetrznych tagow i czy dany tag jest zamykajacym
 							if (innerTagCounter == 0) {
-								System.out.println(wholeTag);						
+								result.add(wholeTag.toString());						
 								wholeTag = new StringBuilder();
 								searchForClosing = false;
 							}
@@ -73,7 +84,7 @@ public class ReadHTMLLottoPage {
 					} else {
 						innerTagCounter++;
 					}
-				} else if (checkIfContains(tagName.toString(), TAG_THAT_WE_SEEK, "class", searchString)) { // jesli znalezlismy tag ktorego szukamy
+				} else if (checkIfContains(tagName.toString(), tagWhatWeSeek, attribute, searchStrings.toArray(new String[0]))) { // jesli znalezlismy tag ktorego szukamy
 					searchForClosing = true;
 					wholeTag.append(tagName);
 				}
@@ -81,20 +92,27 @@ public class ReadHTMLLottoPage {
 				closingTag = false;
 				insideTag = false;
 				tagName = new StringBuilder();
+				
+				// sprawdzamy czy to poczatek znacznika
 			} else {
-				if (((char) input) == '<') { // sprawdzamy czy to poczatek znacznika
+				// Sprawdzamy czy nastepny symbol to znak otwierajacy znacznik <
+				if (ifInputEquals(input, '<')) {
 					int secondInput = 0;
 						
-					if ((secondInput = in.read()) != -1 && ((char) secondInput) == '/') { // jesli tak to musimy sprawdzić czy nie znalezlismy koncowego
+					// jesli tak to musimy sprawdzić czy nie znalezlismy koncowego
+					if ((secondInput = in.read()) != -1 && ((char) secondInput) == '/') {
 						closingTag = true;
 					}
 					
+					// Sprawdzamy czy nie jestesmy w srodku znacznika pomiedzy np. <div>...</div>
 					if (!insideTag) {
 						tagName.append((char) input);
 					}
 					
+					// Musimy pamietac aby rowniez dodac drugi odczytany znak
 					tagName.append((char) secondInput);
 					
+					// Jesli szukamy znacznika zamykajacego dodajemy tylko drugi oddczytany znak do calego tekstku
 					if (searchForClosing) {
 						wholeTag.append((char) secondInput);
 					}
@@ -104,7 +122,11 @@ public class ReadHTMLLottoPage {
 			}
 		}
 		
-		in.close();
+		return result;
+	}
+
+	private static boolean ifInputEquals(int input, char symbol) {
+		return ((char) input) == symbol;
 	}
 	
 	// czy konczacy tag to jest ten ktory szukamy
