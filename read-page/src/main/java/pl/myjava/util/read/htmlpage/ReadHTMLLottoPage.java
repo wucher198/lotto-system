@@ -12,9 +12,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import pl.myjava.util.read.htmlpage.consts.LiteralConsts;
+
 public class ReadHTMLLottoPage {
 	private static final String TAG_THAT_WE_SEEK = "div";
-	private static final String PAGE_URL = "http://www.lotto.pl/lotto/wyniki-i-wygrane";
+	private static final String PAGE_URL = "https://www.lotto.pl/lotto/wyniki-i-wygrane";
 	private static final String USER_AGENT = "Mozilla/5.0";
 	
 	private static final String[] searchString = {"resultsItem lotto"};//, "lotto", "lottoPlus", "lottoSzansa"};
@@ -26,8 +28,8 @@ public class ReadHTMLLottoPage {
 		connection.setRequestMethod("POST");
 		connection.setRequestProperty("User-Agent", USER_AGENT);
 		connection.setRequestProperty("Accept-Language", "pl,en-US;q=0.7,en;q=0.3");
-		
-		String postParameters = "data_losowania%5Bdate%5D=2018-03-06&op=&form_build_id=form-bed0685ead3b2f77ac99ed687f49542b&form_id=lotto_wyszukaj_form";
+
+		String postParameters = "data_losowania%5Bdate%5D=2018-03-06&op=&form_build_id=form-7da30f6f3a3b46cd8e8dd1f72f74f39c&form_id=lotto_wyszukaj_form";
 		
 		connection.setDoOutput(true);
 		DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
@@ -38,11 +40,7 @@ public class ReadHTMLLottoPage {
 		int responseCode = connection.getResponseCode();
 		System.out.println("Response Code: " + responseCode);
 		
-		String testString = "<td>hshshshshs</td><div class=\"lotto\">Some Content<div>Inside content</div></div><p>Paragraph</p>";
-		
 		BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-//		BufferedReader in = new BufferedReader(new StringReader(testString));
-		int input = 0;
 		List<String> result = searchForTags(in, TAG_THAT_WE_SEEK, "class", Arrays.asList(searchString));
 		result.forEach(System.out::println);
 		
@@ -151,9 +149,9 @@ public class ReadHTMLLottoPage {
 		boolean result = false;
 		
 		if (startTag) {
-			result = !tag.contains("/") && tag.contains(searchTag); 
+			result = !tag.contains(LiteralConsts.SLASH) && tag.contains(searchTag); 
 		} else {
-			result = tag.contains("/") && tag.contains(searchTag);
+			result = tag.contains(LiteralConsts.SLASH) && tag.contains(searchTag);
 		}
 		
 		return result;
@@ -163,21 +161,23 @@ public class ReadHTMLLottoPage {
 		boolean result = false;
 		
 		if (tag.contains(searchField)) {
-			StringReader reader = new StringReader(tag.substring(tag.indexOf(searchField) + searchField.length() + 2));
-			int input = 0;
-			boolean finish = false;
-			StringBuilder builder = new StringBuilder();
+//			StringReader reader = new StringReader(tag.substring(tag.indexOf(searchField) + searchField.length() + 2));
+//			int input = 0;
+//			boolean finish = false;
+//			StringBuilder builder = new StringBuilder();
+//			
+//			while ((input = reader.read()) != -1 && !finish) {
+//				if (((char) input) != LiteralConsts.DOUBLE_QUOTE) {
+//					builder.append((char) input);
+//				} else {
+//					finish = true;
+//				}
+//			}
 			
-			while ((input = reader.read()) != -1 && !finish) {
-				if (((char) input) != '"') {
-					builder.append((char) input);
-				} else {
-					finish = true;
-				}
-			}
+			String tagName = tag.substring(tag.indexOf(searchField) + searchField.length() + 2);
 			
 			for (String search : searchValue) {				
-				if (builder.toString().length() > 0 && !builder.toString().equals("") && builder.toString().contains(search) ) {
+				if (StringUtils.isNotEmpty(tagName) && tagName.toString().contains(search) ) {
 					result = true;
 				}
 			}
@@ -186,6 +186,3 @@ public class ReadHTMLLottoPage {
 		return result;
 	}
 }
-
-//Szukaj<img src="/sites/all/themes/basic/images/svg/searchWyniki.svg" alt="" class="img-fluid">
-//<input maxlength="30" name="data_losowania[date]" id="wyszukaj-wyniki-form-datepicker-popup-1" size="20" value="2018-03-03" class="form-text inputCalendar hasDatepicker date-popup-init" placeholder="data losowania" type="text">
