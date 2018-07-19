@@ -4,12 +4,11 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import pl.myjava.util.read.htmlpage.consts.LiteralConsts;
@@ -19,7 +18,8 @@ public class ReadHTMLLottoPage {
 	private static final String PAGE_URL = "https://www.lotto.pl/lotto/wyniki-i-wygrane";
 	private static final String USER_AGENT = "Mozilla/5.0";
 	
-	private static final String[] searchString = {"resultsItem lotto"};//, "lotto", "lottoPlus", "lottoSzansa"};
+//	private static final String[] searchString = {"resultsItem lotto"};//, "lotto", "lottoPlus", "lottoSzansa"};
+	private static final String[] searchString = {"lotto"};//, "lotto", "lottoPlus", "lottoSzansa"};
 	
 	public static void main(String[] args) throws Exception {
 		URL url = new URL(PAGE_URL);
@@ -41,13 +41,31 @@ public class ReadHTMLLottoPage {
 		System.out.println("Response Code: " + responseCode);
 		
 		BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-		List<String> result = searchForTags(in, TAG_THAT_WE_SEEK, "class", Arrays.asList(searchString));
-		result.forEach(System.out::println);
+		List<String> result = searchForTags(in, TAG_THAT_WE_SEEK, "class", true, searchString);
+		result.forEach(oneRow -> {
+			try {				
+				List<String> numbers = searchForTags(new StringReader(oneRow), "span", null, true, null);				
+				System.out.println(oneRow);
+				
+				numbers.forEach(number -> {
+					System.out.print(getElementValue("span", number) + "; " );
+				});
+				
+				System.out.println();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
 		
 		in.close();
 	}
+	
+	private static String getElementValue(String tag, String element) {
+		return element.substring(element.indexOf(tag + ">") + tag.length() + 1, element.lastIndexOf("</" + tag));
+	}
 
-	private static ArrayList<String> searchForTags(BufferedReader in, String tagWhatWeSeek, String attribute, List<String> searchStrings) throws IOException {
+	private static ArrayList<String> searchForTags(Reader in, String tagWhatWeSeek, String attribute, boolean wholeWords, String... searchStrings) throws IOException {
 		ArrayList<String> result = new ArrayList<>();
 		int input;
 		StringBuilder tagName = new StringBuilder();
@@ -75,14 +93,16 @@ public class ReadHTMLLottoPage {
 								result.add(wholeTag.toString());						
 								wholeTag = new StringBuilder();
 								searchForClosing = false;
+							} else {
+								innerTagCounter--;
 							}
+						} else {
+							innerTagCounter--;
 						}
-						
-						innerTagCounter--;
-					} else {
+					} else { 
 						innerTagCounter++;
 					}
-				} else if (checkIfContains(tagName.toString(), tagWhatWeSeek, attribute, searchStrings.toArray(new String[0]))) { // jesli znalezlismy tag ktorego szukamy
+				} else if (checkIfContains(tagName.toString(), tagWhatWeSeek, attribute, wholeWords, searchStrings)) { // jesli znalezlismy tag ktorego szukamy
 					searchForClosing = true;
 					wholeTag.append(tagName);
 				}
@@ -135,11 +155,15 @@ public class ReadHTMLLottoPage {
 	
 	//if begin tag equals
 	//<div class="resultsItem lottoPlus dymek_kulki">
-	private static boolean checkIfContains(String tag, String searchTag, String searchField, String... searchValue) throws IOException {
+	private static boolean checkIfContains(String tag, String searchTag, String searchField, boolean wholeWords, String... searchValue) throws IOException {
 		boolean result = false;
 		
 		if (ifTag(tag, searchTag, true)) {
-			result = ifTagContains(tag, searchField, searchValue);
+			if (StringUtils.isNotEmpty(searchField) && searchValue != null && searchValue.length > 0) {
+				result = ifTagContains(tag, searchField, wholeWords, searchValue);
+			} else {
+				result = true;
+			}
 		}
 		
 		return result;
@@ -157,28 +181,37 @@ public class ReadHTMLLottoPage {
 		return result;
 	}
 	
-	private static boolean ifTagContains(String tag, String searchField, String... searchValue) throws IOException {
+	private static boolean ifTagContains(String tag, String searchField, boolean wholeWords, String... searchValue) throws IOException {
 		boolean result = false;
 		
 		if (tag.contains(searchField)) {
-//			StringReader reader = new StringReader(tag.substring(tag.indexOf(searchField) + searchField.length() + 2));
-//			int input = 0;
-//			boolean finish = false;
-//			StringBuilder builder = new StringBuilder();
-//			
-//			while ((input = reader.read()) != -1 && !finish) {
-//				if (((char) input) != LiteralConsts.DOUBLE_QUOTE) {
-//					builder.append((char) input);
-//				} else {
-//					finish = true;
-//				}
-//			}
-			
-			String tagName = tag.substring(tag.indexOf(searchField) + searchField.length() + 2);
+			String searchFieldValue = tag.substring(tag.indexOf(searchField) + searchField.length() + 2);
+			searchFieldValue = searchFieldValue.substring(0, searchFieldValue.indexOf('"'));
 			
 			for (String search : searchValue) {				
-				if (StringUtils.isNotEmpty(tagName) && tagName.toString().contains(search) ) {
-					result = true;
+				if (StringUtils.isNotEmpty(searchFieldValue) && searchFieldValue.contains(search) ) {
+					if (wholeWords) {
+						int indexOf = searchFieldValue.indexOf(search);
+						int searchStrSize = search.length();
+						String before = null;
+						
+						if ((indexOf - 1) >= 0) { 
+							before = searchFieldValue.substring(indexOf - 1, indexOf);
+						}
+						
+						String after = null;
+						
+						if ((indexOf + searchStrSize + 1) <= searchFieldValue.length()) {
+							after = searchFieldValue.substring(indexOf + searchStrSize, indexOf + searchStrSize + 1);
+						}
+						
+						if ((before == null || before.equals(" ")) 
+								&& (after == null || after.equals(" "))) {
+							result = true;
+						}
+					} else {
+						result = true;
+					}
 				}
 			}
 		}

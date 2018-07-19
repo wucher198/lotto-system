@@ -4,7 +4,7 @@ import pl.myjava.util.read.htmlpage.consts.LiteralConsts;
 
 public class StringUtils {
 	public static boolean isEmpty(String string) {
-		return string.length() <= 0 && string.equals(LiteralConsts.EMPTY_STR);
+		return string == null || string.length() <= 0 || string.equals(LiteralConsts.EMPTY_STR);
 	}
 	
 	public static boolean isNotEmpty(String string) {
