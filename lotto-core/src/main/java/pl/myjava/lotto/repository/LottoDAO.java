@@ -1,5 +1,9 @@
 package pl.myjava.lotto.repository;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -19,5 +23,13 @@ public class LottoDAO {
 		}
 		
 		return result;
+	}
+	
+	public List<LottoGameEntity> getAll() {
+		return entityManager.createQuery("select from " + LottoGameEntity.class.getName(), LottoGameEntity.class).getResultList();
+	}
+	
+	public LottoGameEntity getById(Long id) {
+		return entityManager.find(LottoGameEntity.class, id);
 	}
 }

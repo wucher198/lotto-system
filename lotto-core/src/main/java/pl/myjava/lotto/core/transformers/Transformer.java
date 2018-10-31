@@ -1,25 +1,17 @@
 package pl.myjava.lotto.core.transformers;
 
-import pl.myjava.lotto.api.LottoGame;
-import pl.myjava.lotto.api.LottoNumber;
-import pl.myjava.lotto.repository.entitis.LottoGameEntity;
-import pl.myjava.lotto.repository.entitis.LottoNumberEntity;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class Transformer {	
-	public static LottoGame transform(LottoGameEntity entity) {
-		return LottoGameTransformer.mapToDTO(entity);
+public abstract class Transformer<DTO, ENTITY> {	
+	abstract public DTO toDTO(ENTITY entity);
+	abstract public ENTITY toENTITY(DTO dto);
+	
+	public List<DTO> toDTOs(List<ENTITY> entities) {
+		return entities.stream().map(this::toDTO).collect(Collectors.toList());
 	}
 	
-	public static LottoNumber transform(LottoNumberEntity entity) {
-		return LottoNumberTransformer.mapToDTO(entity);
+	public List<ENTITY> toENTITYs(List<DTO> dtos) {
+		return dtos.stream().map(this::toENTITY).collect(Collectors.toList());
 	}
-	
-	public static LottoNumberEntity transform(LottoNumber lottoNumber) {
-		return LottoNumberTransformer.mapToBO(lottoNumber);
-	}
-	
-	public static LottoGameEntity transform(LottoGame lottoGame) {
-		return LottoGameTransformer.mapToBO(lottoGame);
-	}
-	
 }

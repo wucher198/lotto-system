@@ -1,13 +1,24 @@
 package pl.myjava.lotto.api;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Optional;
+
+import javax.json.Json;
+import javax.json.stream.JsonGenerator;
+
 public class LottoNumber {
 	private Long id;
 	private Byte number;
-	
+
 	public static Builder builder() {
 		return new Builder();
 	}
-	
+
+	public static JSON json() {
+		return new JSON();
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -15,7 +26,7 @@ public class LottoNumber {
 	public Byte getNumber() {
 		return number;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -45,28 +56,37 @@ public class LottoNumber {
 	public String toString() {
 		return "LottoNumber [number=" + number + "]";
 	}
-	
+
 	public static class Builder {
 		private LottoNumber instance;
-		
+
 		private Builder() {
 			instance = new LottoNumber();
 		}
-		
+
 		public Builder identifiedById(Long id) {
 			instance.id = id;
-			
+
 			return this;
 		}
-		
+
 		public Builder withNumber(Byte number) {
 			instance.number = number;
-			
+
 			return this;
 		}
-		
+
 		public LottoNumber build() {
 			return instance;
+		}
+	}
+
+	public static class JSON {
+		public void write(LottoNumber number, JsonGenerator generator) {
+			generator.writeStartObject("lottoNumber")
+				.write("id", number.getId())
+				.write("number", number.getNumber())
+			.writeEnd();
 		}
 	}
 }

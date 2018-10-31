@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import pl.myjava.util.read.htmlpage.consts.LiteralConsts;
 
@@ -18,7 +19,7 @@ public class ReadHTMLLottoPage {
 	private static final String PAGE_URL = "https://www.lotto.pl/lotto/wyniki-i-wygrane";
 	private static final String USER_AGENT = "Mozilla/5.0";
 	
-//	private static final String[] searchString = {"resultsItem lotto"};//, "lotto", "lottoPlus", "lottoSzansa"};
+//	private static final String[] searchS tring = {"resultsItem lotto"};//, "lotto", "lottoPlus", "lottoSzansa"};
 	private static final String[] searchString = {"lotto"};//, "lotto", "lottoPlus", "lottoSzansa"};
 	
 	public static void main(String[] args) throws Exception {
@@ -59,6 +60,10 @@ public class ReadHTMLLottoPage {
 		});
 		
 		in.close();
+	}
+	
+	public ReadHTMLLottoPage(URL url, Map<String, String> parameters) {
+		
 	}
 	
 	private static String getElementValue(String tag, String element) {

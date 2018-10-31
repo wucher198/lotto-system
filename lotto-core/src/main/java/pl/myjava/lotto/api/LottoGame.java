@@ -1,12 +1,17 @@
 package pl.myjava.lotto.api;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonGeneratorFactory;
+
 public class LottoGame {
 	private Long id;
-	private String name;
-	private Long lotNumber;
+	private LottoGameType type;
 	private List<LottoNumber> numbers;
 	
 	public static Builder builder() {
@@ -17,72 +22,23 @@ public class LottoGame {
 		numbers = new ArrayList<>();
 	}
 	
-	public LottoGame(Long id, String name, List<LottoNumber> numbers) {
+	public LottoGame(Long id, LottoGameType type, List<LottoNumber> numbers) {
 		this.id = id;
-		this.name = name;
+		this.type = type;
 		this.numbers = numbers;
-	}	
-
+	}
+	
 	public Long getId() {
 		return id;
 	}
 
-	public String getName() {
-		return name;
+	public LottoGameType getType() {
+		return type;
 	}
 
 	public List<LottoNumber> getNumbers() {
 		return numbers;
 	}
-	
-	public Long getLotNumber() {
-		return lotNumber;
-	}
-		
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((lotNumber == null) ? 0 : lotNumber.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((numbers == null) ? 0 : numbers.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		LottoGame other = (LottoGame) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (lotNumber == null) {
-			if (other.lotNumber != null)
-				return false;
-		} else if (!lotNumber.equals(other.lotNumber))
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (numbers == null) {
-			if (other.numbers != null)
-				return false;
-		} else if (!numbers.equals(other.numbers))
-			return false;
-		return true;
-	}
-
-
 
 	public static class Builder {
 		private LottoGame instance;
@@ -103,14 +59,38 @@ public class LottoGame {
 			return this;
 		}
 		
-		public Builder identifiedByName(String name) {
-			instance.name = name;
+		public Builder withNumbers(List<LottoNumber> numbers) {
+			instance.numbers.addAll(numbers);
+			
+			return this;
+		}
+		
+		public Builder identifiedByType(LottoGameType type) {
+			instance.type = type;
 			
 			return this;
 		}
 		
 		public LottoGame build() {
 			return instance;
+		}
+	}
+	
+	public static class JSON {
+		public String create(LottoGame lottoGame) {
+			StringWriter writer = new StringWriter();
+			JsonGenerator generator = Json.createGenerator(writer);
+			generator.writeStartObject("lottoGame")
+				.write("id", lottoGame.getId());
+			lottoGame.getType().toJSON(generator);
+			generator.writeStartArray("numbers");
+			lottoGame.getNumbers().stream()
+				.forEach(number -> LottoNumber.json().write(number, generator));
+			generator
+				.writeEnd()
+				.close();
+			
+			return writer.toString();
 		}
 	}
 }

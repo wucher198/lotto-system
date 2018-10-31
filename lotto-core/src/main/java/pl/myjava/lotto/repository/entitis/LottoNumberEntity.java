@@ -6,7 +6,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-@Entity
+@Entity(name = "lotto_number")
 public class LottoNumberEntity {
 	@Id
 	private Long id;
