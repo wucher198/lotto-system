@@ -45,7 +45,7 @@ public class LottoController {
 	}
 
 	public String addLottoGame(@PathParam("lottoGame") String lottoGame) {
-		return lottoService.addLottoGame(lottoGame);
+		return lottoService.addLottoGame(fromJSON(lottoGame).get()).toString();
 	}
 
 	private Optional<LottoGame> fromJSON(String lottoGame) {
@@ -53,8 +53,10 @@ public class LottoController {
 
 		try (Reader reader = new StringReader(lottoGame)) {
 			JsonReader jsonReader = Json.createReader(reader);
+			LottoGame
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage());
+			
 		}
 
 		return result;

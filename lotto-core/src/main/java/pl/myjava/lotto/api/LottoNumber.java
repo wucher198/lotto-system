@@ -1,22 +1,17 @@
 package pl.myjava.lotto.api;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Optional;
-
-import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
 import javax.json.stream.JsonGenerator;
 
-public class LottoNumber {
+import pl.myjava.lotto.core.transformers.JsonCapable;
+
+public class LottoNumber implements JsonCapable {
 	private Long id;
 	private Byte number;
 
 	public static Builder builder() {
 		return new Builder();
-	}
-
-	public static JSON json() {
-		return new JSON();
 	}
 
 	public Long getId() {
@@ -25,6 +20,26 @@ public class LottoNumber {
 
 	public Byte getNumber() {
 		return number;
+	}
+	
+	private static final String TYPE_NAME = "lottoNumber";
+	private static final String ID = "id";
+	private static final String NUMBER = "number";
+
+	@Override
+	public void createJson(JsonGenerator generator) {
+		generator
+			.writeStartObject()
+				.write(ID, id)
+				.write(NUMBER, number)
+			.writeEnd();
+	}
+	
+	public void parseJson(JsonObject object) {		
+		if (object != null) {
+			id = Long.valueOf(object.getInt(ID));
+			number = (byte) object.getInt(NUMBER);			
+		}
 	}
 
 	@Override
@@ -63,6 +78,12 @@ public class LottoNumber {
 		private Builder() {
 			instance = new LottoNumber();
 		}
+		
+		public Builder describedByJSON(JsonObject object) {
+			instance.parseJson(object);
+			
+			return this;
+		}
 
 		public Builder identifiedById(Long id) {
 			instance.id = id;
@@ -78,15 +99,6 @@ public class LottoNumber {
 
 		public LottoNumber build() {
 			return instance;
-		}
-	}
-
-	public static class JSON {
-		public void write(LottoNumber number, JsonGenerator generator) {
-			generator.writeStartObject("lottoNumber")
-				.write("id", number.getId())
-				.write("number", number.getNumber())
-			.writeEnd();
 		}
 	}
 }
