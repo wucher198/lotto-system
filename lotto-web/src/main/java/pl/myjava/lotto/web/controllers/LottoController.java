@@ -43,6 +43,10 @@ public class LottoController {
 		System.out.print(name);
 		return "<xml><result>" + lottoService.test(name) + "</result></xml>";
 	}
+	
+	public String getResultForDate(@PathParam("date") String date, @PathParam("gameType") String gameType) {
+		re		
+	}
 
 	public String addLottoGame(@PathParam("lottoGame") String lottoGame) {
 		return lottoService.addLottoGame(fromJSON(lottoGame).get()).toString();
@@ -53,7 +57,7 @@ public class LottoController {
 
 		try (Reader reader = new StringReader(lottoGame)) {
 			JsonReader jsonReader = Json.createReader(reader);
-			LottoGame
+//			LottoGame
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage());
 			
