@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">
+	$( document ).ready( function() {
+		$( '#getGameFromLotto').click( function( event ) {
+				event.preventDefault();
+			
+				var result = $( '#result' );
+				
+				var queryParameters = {
+						gameDate: $( '#gameDate' ).val(),
+						gameType: $( '#gameType' ).val()
+					};
+				
+				var json = JSON.stringify(queryParameters);
+				
+				$.ajax( 'lotto/readResultForDate/' + json, {
+					dataType:'json',
+					data:{},
+					type:'POST',
+					success:function ( data ) {
+						console.log("Success: " + data.result);
+						$( '#result' ).text( data.result );
+					}
+				}).error( function() {
+					console.log("Error");
+				});
+			});
+		});
+</script>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h3>Wprowadź datę gry i rodzaj</h3>
+	<form name="formReadFromLotto">
+		<fieldset>
+			<label for="gameDate" id="gameData_label">Data</label>
+			<input name="gameDate" id="gameDate" type="date" required placeholder="Data gry">
+			<label for="gameType" id="gameType_label">Typ Gry</label>
+			<select name="gameType" id="gameType">
+				<option value="LOTTO">Lotto</option>
+				<option value="MULTI">Multi</option>
+			</select>
+			<input type="submit" id="getGameFromLotto" value="Pobierz Grę"/>
+		</fieldset>
+	</form>
+	<span id="result"></span>
+</body>
+</html>

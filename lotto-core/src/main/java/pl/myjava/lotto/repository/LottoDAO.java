@@ -1,7 +1,5 @@
 package pl.myjava.lotto.repository;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import javax.ejb.Stateless;

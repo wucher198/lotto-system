@@ -3,10 +3,10 @@ package pl.myjava.util.read.htmlpage;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -57,7 +57,7 @@ public class URLReaderStrategyImpl implements ReaderStrategy {
 	private String createURLParameters(Map<String, String> parameters) {
 		return parameters.keySet().stream()
 				.map(parameters::get)
-				.map(URLEncoder::encode)
+				.map(key -> URLEncoder.encode(key, Charset.defaultCharset()))
 				.collect(Collectors.joining("&"));				
 	}
 

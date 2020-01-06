@@ -58,6 +58,11 @@
 			<artifactId>javax.json-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<scope>provided</scope>
+			</dependency>
 	</dependencies>
 	<build>
 		<!-- Set the name of the WAR, used as the context root when the app is 

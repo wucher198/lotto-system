@@ -1,14 +1,16 @@
 package pl.myjava.lotto.web.controllers;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import javax.ejb.EJB;
 import javax.json.Json;
 import javax.json.JsonReader;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -18,8 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pl.myjava.lotto.api.LottoGame;
+import pl.myjava.lotto.api.LottoGameType;
 import pl.myjava.lotto.api.LottoService;
-import pl.myjava.lotto.core.LottoServiceImpl;
 
 @Path("/")
 public class LottoController {
@@ -44,10 +46,23 @@ public class LottoController {
 		return "<xml><result>" + lottoService.test(name) + "</result></xml>";
 	}
 	
-	public String getResultForDate(@PathParam("date") String date, @PathParam("gameType") String gameType) {
-		re		
+	@GET
+	@Path("/testFunction")
+	public String testFunction() {
+		return "Udało się";
 	}
 
+	@POST
+	@Path("/readResultForDate/{queryParameters}")
+	@Produces("application/json")
+	public String readResultForDate(@PathParam("queryParameters") String queryParameters) {		
+		LOGGER.info("Query Parameters: " + queryParameters);
+		
+		return lottoService.readResultForDate(transformDate(gameDate), transformLottoGameType(gameType)).toString();
+	}
+	
+	@POST
+	@Path("/addLottoGame/{lottoGame}")
 	public String addLottoGame(@PathParam("lottoGame") String lottoGame) {
 		return lottoService.addLottoGame(fromJSON(lottoGame).get()).toString();
 	}

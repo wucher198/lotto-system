@@ -1,7 +1,6 @@
 package pl.myjava.lotto.api;
 
 import javax.json.JsonObject;
-import javax.json.JsonValue;
 import javax.json.stream.JsonGenerator;
 
 import pl.myjava.lotto.core.transformers.JsonCapable;

@@ -10,7 +10,12 @@ import javax.json.stream.JsonGenerator;
 import org.testng.annotations.Test;
 
 public class LottoGameJsonTest {
-	private final String JSON = "{\"lottoGame\":{\"id\":1,\"numbers\":[{\"id\":1,\"number\":12},{\"id\":2,\"number\":49}],\"lottoGameType\":{\"name\":\"Lotto\",\"minNumbers\":6,\"maxNumbers\":6}}}";
+	private final String JSON = "{\"lottoGame\":{"
+			+ "\"id\":1,"
+			+ "\"numbers\":["
+				+ "{\"id\":1,"
+			 	+  "\"number\":12},"
+			 	+ "{\"id\":2,\"number\":49}],\"lottoGameType\":{\"name\":\"Lotto\",\"minNumbers\":6,\"maxNumbers\":6}}}";
 
 	@Test
 	public void shouldCreateJson() {
@@ -24,7 +29,6 @@ public class LottoGameJsonTest {
 		generator.writeEnd();
 		generator.flush();
 		generator.close();
-		System.out.println(writer.getBuffer().toString());
 	}
 	
 	@Test

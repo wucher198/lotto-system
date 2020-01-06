@@ -3,9 +3,9 @@ package pl.myjava.lotto.api;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import javax.json.JsonArray;
-import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 import javax.json.stream.JsonGenerator;
@@ -60,7 +60,7 @@ public class LottoGame implements JsonCapable {
 	
 	public void parseJson(JsonObject object) {
 		JsonValue thisObject = object.get(NAME);
-		
+
 		if (thisObject != null) {
 			JsonObject obj = thisObject.asJsonObject();
 			id = Long.valueOf(obj.getInt(ID));
